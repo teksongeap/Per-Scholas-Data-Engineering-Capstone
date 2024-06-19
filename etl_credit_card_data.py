@@ -109,6 +109,7 @@ credit_df = credit_df.withColumnRenamed("CREDIT_CARD_NO", "CUST_CC_NO")
 # Reorder columns
 credit_df = credit_df.select("TRANSACTION_ID", "TIME_ID", "CUST_CC_NO", "CUST_SSN", "BRANCH_CODE", "TRANSACTION_TYPE", "TRANSACTION_VALUE")
 
+# Show preview of DataFrames
 print(customer_df.show(truncate=False))
 print(branch_df.show(truncate=False))
 print(credit_df.show(truncate=False))
@@ -118,7 +119,7 @@ print(credit_df.show(truncate=False))
 # Create the database and the tables
 create_db_and_tables_with_keys("localhost", "root", "password", "creditcard_capstone")
 
-# Arguments for writing to the database using pyspark
+# Arguments for writing to the database using Pyspark
 jdbc_url = "jdbc:mysql://localhost:3306/creditcard_capstone"
 connection_prop = {
     "user": "root",
@@ -138,7 +139,11 @@ def write_dataframe_to_mysql(df, table_name):
 # Write DataFrames to MySQL tables with error handling
 write_dataframe_to_mysql(customer_df, "CDW_SAPP_CUSTOMER")
 write_dataframe_to_mysql(branch_df, "CDW_SAPP_BRANCH")
-write_dataframe_to_mysql(credit_df, "CDW_SAPP_CREDITCARD")
+write_dataframe_to_mysql(credit_df, "CDW_SAPP_CREDIT_CARD")
+
+# customer_df.write.jdbc(url=jdbc_url, table="CDW_SAPP_CUSTOMER", mode="append", properties=connection_prop)
+# branch_df.write.jdbc(url=jdbc_url, table="CDW_SAPP_BRANCH", mode="append", properties=connection_prop)
+# credit_df.write.jdbc(url=jdbc_url, table="CDW_SAPP_CREDIT_CARD", mode="append", properties=connection_prop)
 
 # Stop the session
 spark.stop()
