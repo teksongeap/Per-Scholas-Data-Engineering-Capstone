@@ -1,4 +1,4 @@
-import mysql.connector
+import mysql.connector as dbconnect
 from mysql.connector import Error
 
 
@@ -6,7 +6,7 @@ from mysql.connector import Error
 def create_database(host_name, user_name, user_password, db_name):
     connection = None
     try:
-        connection = mysql.connector.connect(
+        connection = dbconnect.connect(
             host=host_name,
             user=user_name,
             password=user_password
@@ -27,7 +27,6 @@ def create_database(host_name, user_name, user_password, db_name):
 
 # Create the database and tables CDW_SAPP_CUSTOMER, CDW_SAPP_CREDITCARD, CDW_SAPP_BRANCH if they don't exist            
 def create_db_and_tables_with_keys(host_name, user_name, user_password, db_name):
-    
     # Create the database using the function above
     create_database(host_name, user_name, user_password, db_name)
     
@@ -35,7 +34,7 @@ def create_db_and_tables_with_keys(host_name, user_name, user_password, db_name)
     connection = None
     try:
         # Connect using credentials
-        connection = mysql.connector.connect(
+        connection = dbconnect.connect(
             host=host_name,
             user=user_name,
             password=user_password,
