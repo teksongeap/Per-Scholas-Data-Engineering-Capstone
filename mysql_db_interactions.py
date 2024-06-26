@@ -23,8 +23,6 @@ def create_connection():
 def list_transactions(zipcode, month, year):
     connection = create_connection()
     cursor = connection.cursor()
-    month = int(month)
-    year = int(year)
     
     # Get the range to use with BETWEEN ... AND clause of sql query
     start_date = datetime(year, month, 1)
@@ -115,5 +113,5 @@ def update_customer():
 
 # Test functions
 if __name__ == "__main__":
-    list_transactions('98908', '5', '2018')
+    list_transactions('98908', 5, 2018)
     get_customer_details('marcel', 'andreas', 'camp')
