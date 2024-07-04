@@ -20,12 +20,10 @@ def create_connection():
         print(f"Error: '{e}'")
         return None
 
-# Returns results of sql query for transactions from creditcard_capstone db
-def list_transactions(zipcode, month, year):
-    connection = create_connection()
-    cursor = connection.cursor()
-    
-    # Get the range to use with BETWEEN ... AND clause of sql query
+# Transactions
+# Get month range, returns tuple of start and end date of a chosen month in a chosen year
+def get_month_range(month, year):
+     # Get the range to use with BETWEEN ... AND clause of sql query
     start_date = datetime(year, month, 1)
     # If month is December and thus the next month would be in the next year...
     if month == 12:
@@ -38,7 +36,15 @@ def list_transactions(zipcode, month, year):
     start_time_id = start_date.strftime('%Y%m%d')
     end_time_id = end_date.strftime('%Y%m%d')
     
-    # print("start time:", start_time_id, "end time:", end_time_id, "object type:", type(start_time_id))
+    return (start_time_id, end_time_id)
+
+    
+# Returns results of sql query for transactions from creditcard_capstone db, order by desc
+def list_transactions(zipcode, month, year):
+    connection = create_connection()
+    cursor = connection.cursor()
+    
+    month_range = get_month_range(month, year)
 
     query = """
             SELECT 
@@ -59,7 +65,8 @@ def list_transactions(zipcode, month, year):
                 t.TIME_ID DESC;
             """
     
-    cursor.execute(query, (zipcode, start_time_id, end_time_id))
+    # Use the '*' operator to unpack into remaining '%s' slots
+    cursor.execute(query, (zipcode, *month_range))
     
     results = cursor.fetchall()
     
@@ -78,6 +85,7 @@ def list_transactions(zipcode, month, year):
     # print(df)
     return df
 
+# Customers
 # Returns results of sql query for customers from creditcard_capstone db
 def get_customer(firstname, lastname, last_4_ssn):
     connection = create_connection()
@@ -109,7 +117,7 @@ def get_customer(firstname, lastname, last_4_ssn):
     df = pd.DataFrame(results, columns=column_names)
     return df
 
-# -----FUNCTIONS FOR FORMATTING INPUT BEFORE UPDATING CUSTOMER-----
+# -----FUNCTIONS FOR FORMATTING INPUT-----
 def format_name(name):
     return name.title()
 
@@ -228,6 +236,92 @@ def update_customer(firstname, lastname, last_4_ssn, updates):
         if connection and connection.is_connected():
             connection.close()
             print("Connection to MySQL database closed")
+
+# Get monthly bill for cc number, month and year
+def monthly_bill(cc, month, year):
+    cc = validate_cc(cc)
+    month_range = get_month_range(month, year)
+    
+    connection = create_connection()
+    cursor = connection.cursor()
+    
+    query = """
+            SELECT 
+                t.CUST_CC_NO,
+                SUM(t.TRANSACTION_VALUE) as "Monthly Bill for Given Month and Year"
+            FROM 
+                CDW_SAPP_CREDIT_CARD t
+            WHERE
+                t.CUST_CC_NO = %s
+                AND t.TIME_ID BETWEEN %s AND %s
+            GROUP BY
+                t.CUST_CC_NO;
+            """
+    
+    # Use the '*' operator to unpack into remaining '%s' slots
+    cursor.execute(query, (cc, *month_range))
+    
+    results = cursor.fetchall()
+    
+    # Close cursor and connection
+    if cursor:
+        cursor.close()
+    if connection and connection.is_connected():
+        connection.close()
+        print("Connection to MySQL database closed")
+
+    # Get column names
+    column_names = [desc[0] for desc in cursor.description]
+    
+    # To dataframe
+    df = pd.DataFrame(results, columns=column_names)
+    # print(df)
+    return df
+    
+# Returns results of transactions made by customer between two dates, order by desc
+def list_transactions_btwn_2_dates(firstname, lastname, last_4_ssn, date1, date2):
+    connection = create_connection()
+    cursor = connection.cursor()
+    
+    query = """
+            SELECT 
+                t.TRANSACTION_ID,
+                t.TIME_ID,
+                t.TRANSACTION_TYPE,
+                t.TRANSACTION_VALUE,
+                t.CUST_CC_NO,
+                t.BRANCH_CODE
+            FROM 
+                CDW_SAPP_CREDIT_CARD t
+            JOIN
+                CDW_SAPP_CUSTOMER c ON t.CUST_SSN = c.SSN
+            WHERE
+                c.FIRST_NAME = %s
+                AND c.LAST_NAME = %s 
+                AND RIGHT(SSN, 4) = %s
+                AND t.TIME_ID BETWEEN %s AND %s
+            ORDER BY
+                t.TIME_ID DESC;
+            """
+
+    cursor.execute(query, (firstname, lastname, last_4_ssn, date1, date2))
+    
+    results = cursor.fetchall()
+    
+    # Close cursor and connection
+    if cursor:
+        cursor.close()
+    if connection and connection.is_connected():
+        connection.close()
+        print("Connection to MySQL database closed")
+
+    # Get column names
+    column_names = [desc[0] for desc in cursor.description]
+    
+    # To dataframe
+    df = pd.DataFrame(results, columns=column_names)
+    # print(df)
+    return df
 
 # Test functions
 if __name__ == "__main__":
