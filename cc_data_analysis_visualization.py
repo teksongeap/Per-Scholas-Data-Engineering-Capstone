@@ -9,11 +9,11 @@ engine = sqlalchemy.create_engine('mysql://root:password@localhost/creditcard_ca
 # -----3.1-----
 # sql query to get transaction counts by type
 transaction_type_query = """
-        SELECT TRANSACTION_TYPE, COUNT(*) as TRANSACTION_COUNT
-        FROM CDW_SAPP_CREDIT_CARD
-        GROUP BY TRANSACTION_TYPE
-        ORDER BY TRANSACTION_COUNT DESC
-        """
+SELECT TRANSACTION_TYPE, COUNT(*) as TRANSACTION_COUNT
+FROM CDW_SAPP_CREDIT_CARD
+GROUP BY TRANSACTION_TYPE
+ORDER BY TRANSACTION_COUNT DESC
+"""
 
 # Execute transaction_type_query and load results into a DataFrame
 transaction_type_df = pd.read_sql(transaction_type_query, engine)
@@ -54,12 +54,12 @@ print("Plot saved as '3.1_transaction_type_pie_chart.png'")
 # -----3.2-----
 # sql query to get top 10 states with highest number of customers
 top_10_states_customer_number_query = """
-        SELECT CUST_STATE, COUNT(*) AS CUSTOMER_COUNT
-        FROM CDW_SAPP_CUSTOMER
-        GROUP BY CUST_STATE
-        ORDER BY CUSTOMER_COUNT DESC
-        LIMIT 10
-        """
+SELECT CUST_STATE, COUNT(*) AS CUSTOMER_COUNT
+FROM CDW_SAPP_CUSTOMER
+GROUP BY CUST_STATE
+ORDER BY CUSTOMER_COUNT DESC
+LIMIT 10
+"""
         
 customer_number_df = pd.read_sql(top_10_states_customer_number_query, engine)
 
@@ -85,18 +85,18 @@ print("Plot saved as '3.2_top_10_states_by_customer_count.png'")
 
 # -----3.3-----
 top_10_customers_query = """
-        SELECT 
-            c.FIRST_NAME, 
-            C.LAST_NAME, 
-            SUM(t.TRANSACTION_VALUE) AS TOTAL
-        FROM CDW_SAPP_CUSTOMER c
-        JOIN CDW_SAPP_CREDIT_CARD t ON c.SSN = t.CUST_SSN
-        GROUP BY
-            c.SSN,
-            c.FIRST_NAME,
-            c.LAST_NAME
-        ORDER BY TOTAL DESC
-        LIMIT 10
+SELECT 
+    c.FIRST_NAME, 
+    C.LAST_NAME, 
+    SUM(t.TRANSACTION_VALUE) AS TOTAL
+FROM CDW_SAPP_CUSTOMER c
+JOIN CDW_SAPP_CREDIT_CARD t ON c.SSN = t.CUST_SSN
+GROUP BY
+    c.SSN,
+    c.FIRST_NAME,
+    c.LAST_NAME
+ORDER BY TOTAL DESC
+LIMIT 10
 """ 
 
 top_10_customer_df = pd.read_sql(top_10_customers_query, engine)

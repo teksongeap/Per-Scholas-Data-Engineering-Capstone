@@ -47,23 +47,23 @@ def list_transactions(zipcode, month, year):
     month_range = get_month_range(month, year)
 
     query = """
-            SELECT 
-                t.TRANSACTION_ID,
-                t.TIME_ID,
-                t.TRANSACTION_TYPE,
-                t.TRANSACTION_VALUE,
-                t.CUST_CC_NO,
-                t.BRANCH_CODE
-            FROM 
-                CDW_SAPP_CREDIT_CARD t
-            JOIN
-                CDW_SAPP_CUSTOMER c ON t.CUST_SSN = c.SSN
-            WHERE
-                c.CUST_ZIP = %s
-                AND t.TIME_ID BETWEEN %s AND %s
-            ORDER BY
-                t.TIME_ID DESC;
-            """
+    SELECT 
+        t.TRANSACTION_ID,
+        t.TIME_ID,
+        t.TRANSACTION_TYPE,
+        t.TRANSACTION_VALUE,
+        t.CUST_CC_NO,
+        t.BRANCH_CODE
+    FROM 
+        CDW_SAPP_CREDIT_CARD t
+    JOIN
+        CDW_SAPP_CUSTOMER c ON t.CUST_SSN = c.SSN
+    WHERE
+        c.CUST_ZIP = %s
+        AND t.TIME_ID BETWEEN %s AND %s
+    ORDER BY
+        t.TIME_ID DESC;
+    """
     
     # Use the '*' operator to unpack into remaining '%s' slots
     cursor.execute(query, (zipcode, *month_range))
@@ -91,15 +91,15 @@ def get_customer(firstname, lastname, last_4_ssn):
     connection = create_connection()
     cursor = connection.cursor()
     query = """
-            SELECT 
-                * 
-            FROM 
-                CDW_SAPP_CUSTOMER c 
-            WHERE 
-                FIRST_NAME = %s
-                AND LAST_NAME = %s 
-                AND RIGHT(SSN, 4) = %s;
-            """
+    SELECT 
+        * 
+    FROM 
+        CDW_SAPP_CUSTOMER c 
+    WHERE 
+        FIRST_NAME = %s
+        AND LAST_NAME = %s 
+        AND RIGHT(SSN, 4) = %s;
+    """
     cursor.execute(query, (firstname, lastname, last_4_ssn))
     results = cursor.fetchall()
     
@@ -203,16 +203,16 @@ def update_customer(firstname, lastname, last_4_ssn, updates):
         # Notice the '%s' being added, this will be used in the cursor.execute() function below
         set_clause = ", ".join(f'{key} = %s' for key in formatted_updates.keys())
         query = f"""
-                UPDATE 
-                    CDW_SAPP_CUSTOMER
-                SET 
-                    {set_clause},
-                    LAST_UPDATED = %s
-                WHERE 
-                    FIRST_NAME = %s
-                    AND LAST_NAME = %s 
-                    AND RIGHT(SSN, 4) = %s;
-                """
+        UPDATE 
+            CDW_SAPP_CUSTOMER
+        SET 
+            {set_clause},
+            LAST_UPDATED = %s
+        WHERE 
+            FIRST_NAME = %s
+            AND LAST_NAME = %s 
+            AND RIGHT(SSN, 4) = %s;
+        """
         # Get current time
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         # Execute query, using '*' to unpack values of formatted_updates into the '%s' slots created by the gen exp in set_clause
@@ -246,17 +246,17 @@ def monthly_bill(cc, month, year):
     cursor = connection.cursor()
     
     query = """
-            SELECT 
-                t.CUST_CC_NO,
-                SUM(t.TRANSACTION_VALUE) as "Monthly Bill for Given Month and Year"
-            FROM 
-                CDW_SAPP_CREDIT_CARD t
-            WHERE
-                t.CUST_CC_NO = %s
-                AND t.TIME_ID BETWEEN %s AND %s
-            GROUP BY
-                t.CUST_CC_NO;
-            """
+    SELECT 
+        t.CUST_CC_NO,
+        SUM(t.TRANSACTION_VALUE) as "Monthly Bill for Given Month and Year"
+    FROM 
+        CDW_SAPP_CREDIT_CARD t
+    WHERE
+        t.CUST_CC_NO = %s
+        AND t.TIME_ID BETWEEN %s AND %s
+    GROUP BY
+        t.CUST_CC_NO;
+    """
     
     # Use the '*' operator to unpack into remaining '%s' slots
     cursor.execute(query, (cc, *month_range))
@@ -284,25 +284,25 @@ def list_transactions_btwn_2_dates(firstname, lastname, last_4_ssn, date1, date2
     cursor = connection.cursor()
     
     query = """
-            SELECT 
-                t.TRANSACTION_ID,
-                t.TIME_ID,
-                t.TRANSACTION_TYPE,
-                t.TRANSACTION_VALUE,
-                t.CUST_CC_NO,
-                t.BRANCH_CODE
-            FROM 
-                CDW_SAPP_CREDIT_CARD t
-            JOIN
-                CDW_SAPP_CUSTOMER c ON t.CUST_SSN = c.SSN
-            WHERE
-                c.FIRST_NAME = %s
-                AND c.LAST_NAME = %s 
-                AND RIGHT(SSN, 4) = %s
-                AND t.TIME_ID BETWEEN %s AND %s
-            ORDER BY
-                t.TIME_ID DESC;
-            """
+    SELECT 
+        t.TRANSACTION_ID,
+        t.TIME_ID,
+        t.TRANSACTION_TYPE,
+        t.TRANSACTION_VALUE,
+        t.CUST_CC_NO,
+        t.BRANCH_CODE
+    FROM 
+        CDW_SAPP_CREDIT_CARD t
+    JOIN
+        CDW_SAPP_CUSTOMER c ON t.CUST_SSN = c.SSN
+    WHERE
+        c.FIRST_NAME = %s
+        AND c.LAST_NAME = %s 
+        AND RIGHT(SSN, 4) = %s
+        AND t.TIME_ID BETWEEN %s AND %s
+    ORDER BY
+        t.TIME_ID DESC;
+    """
 
     cursor.execute(query, (firstname, lastname, last_4_ssn, date1, date2))
     
