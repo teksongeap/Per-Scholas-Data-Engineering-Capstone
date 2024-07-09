@@ -1,0 +1,8 @@
+argparse
+matplotlib
+mysql-connector-python
+pandas
+pyspark
+requests
+seaborn
+sqlalchemy
