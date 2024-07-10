@@ -57,14 +57,7 @@ Per-Scholas-Data-Engineering-Capstone/
 
 3. **Setup the MySQL database:**
    - Ensure your MySQL server is running.
-   - Create a database for the project:
-     ```sql
-     CREATE DATABASE capstone_db;
-     ```
-   - Run the `mysql_db_setup.py` script to initialize the database schema:
-     ```sh
-     python mysql_db_setup.py
-     ```
+   - You may run etl_credit_card_data.py to setup the MySQL database.
 
 ## Usage
 
