@@ -33,7 +33,7 @@ data1 = pd.DataFrame({
 })
 
 # Set seaborn style
-sns.set_style('whitegrid')
+# sns.set_style('whitegrid')
 colors = sns.color_palette("pastel")
 
 # Create pie chart
@@ -43,8 +43,11 @@ plt.pie(data1['Percentage'], labels=data1['Status'], colors=colors,
         autopct='%1.1f%%', startangle=90, explode=[0.1, 0])
 plt.title('Percentage of Approved Applications for Self Employed Applicants', fontsize=16)
 
+plt.tight_layout()
+
 # save the plot
 plt.savefig('visualizations/5.1_self_employed_approval_percentage.png')
+print("Plot saved as 'visualizations/5.1_self_employed_approval_percentage.png'")
 plt.close()
 
 # -----5.2-----
@@ -68,8 +71,11 @@ plt.pie(data2['Percentage'], labels=data2['Status'], colors=colors,
         autopct='%1.1f%%', startangle=90, explode=[0.1, 0])
 plt.title('Percentage of Rejected Applications for Married Male Applicants', fontsize=16)
 
+plt.tight_layout()
+
 # save the plot
 plt.savefig('visualizations/5.2_married_male_rejection_percentage.png')
+print("Plot saved as 'visualizations/5.2_married_male_rejection_percentage.png'")
 plt.close()
 
 # -----5.3-----
@@ -117,6 +123,9 @@ for i, v in enumerate(data3['Transaction_Count']):
 plt.tight_layout()
 
 plt.savefig('visualizations/5.3_top_3_months_transaction_volume.png')
+
+print("Plot saved as 'visualizations/5.3_top_3_months_transaction_volume.png'")
+
 plt.close()
 
 # -----5.4-----
@@ -139,15 +148,6 @@ branch_df = spark.read \
 # branch_df.select('BRANCH_CODE').distinct().show()
 
 # Perform the join, filter, group by, and aggregation
-healthcare_transactions = cc_df.alias('cc') \
-    .join(branch_df.alias('br'), col('cc.BRANCH_CODE') == col('br.BRANCH_CODE')) \
-    .filter(col('cc.TRANSACTION_TYPE') == 'Healthcare') \
-    .groupBy('br.BRANCH_CODE', 'br.BRANCH_NAME', 'br.BRANCH_STATE', 'br.BRANCH_ZIP') \
-    .agg(sum('cc.TRANSACTION_VALUE').alias('TOTAL_VALUE')) \
-    .orderBy(desc('TOTAL_VALUE')) \
-    .limit(10)  # Get top 10 branches
-
-# Your existing Spark code
 healthcare_transactions = cc_df.alias('cc') \
     .join(branch_df.alias('br'), col('cc.BRANCH_CODE') == col('br.BRANCH_CODE')) \
     .filter(col('cc.TRANSACTION_TYPE') == 'Healthcare') \
@@ -186,5 +186,6 @@ plt.tight_layout()
 plt.savefig('visualizations/5.4_top_branches_healthcare_transactions.png')
 plt.close()
 
+print("Plot saved as 'visualizations/5.4_top_branches_healthcare_transactions.png'")
 
 spark.stop()
