@@ -23,7 +23,6 @@ total = transaction_type_df['TRANSACTION_COUNT'].sum()
 transaction_type_df['PERCENTAGE'] = transaction_type_df['TRANSACTION_COUNT'] / total * 100
 
 # Set the style and color palette
-sns.set_style("whitegrid")
 colors = sns.color_palette("pastel")
 
 # Create explode tuple (0.1 for the largest slice, 0 for others)
@@ -63,9 +62,6 @@ LIMIT 10
         
 customer_number_df = pd.read_sql(top_10_states_customer_number_query, engine)
 
-# Set the style
-sns.set_style("whitegrid")
-sns.set_palette("pastel")
 
 # Create the bar plot
 plt.figure(figsize=(14,7))
@@ -102,8 +98,6 @@ LIMIT 10
 top_10_customer_df = pd.read_sql(top_10_customers_query, engine)
 top_10_customer_df['FULL_NAME'] = top_10_customer_df['FIRST_NAME'] + ' ' + top_10_customer_df['LAST_NAME']
 
-sns.set_style('whitegrid')
-sns.set_palette('pastel') 
 
 plt.figure(figsize=(14, 7))
 ax = sns.barplot(x='FULL_NAME', y='TOTAL', data=top_10_customer_df)
