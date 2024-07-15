@@ -2,9 +2,20 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import sqlalchemy
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from the .env file
+load_dotenv('secrets.env')
+
+host = os.getenv('HOST')
+username = os.getenv('USER')
+password = os.getenv('PASSWORD')
+database = os.getenv('DATABASE')
+database_url = os.getenv('DATABASE_URL')
 
 # Establish connection to database
-engine = sqlalchemy.create_engine('mysql://root:password@localhost/creditcard_capstone')
+engine = sqlalchemy.create_engine(f"mysql://{username}:{password}@{host}/{database}")
 
 # -----3.1-----
 # sql query to get transaction counts by type

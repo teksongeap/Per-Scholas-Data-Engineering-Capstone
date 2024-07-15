@@ -1,6 +1,16 @@
 import mysql.connector as dbconnect
 from mysql.connector import Error
+from dotenv import load_dotenv
+import os
 
+# Load environment variables from the .env file
+load_dotenv('secrets.env')
+
+host = os.getenv('HOST')
+username = os.getenv('USER')
+password = os.getenv('PASSWORD')
+database = os.getenv('DATABASE')
+database_url = os.getenv('DATABASE_URL')
 
 # Creating database and creating tables must be separate
 def create_database(host_name, user_name, user_password, db_name):
@@ -141,4 +151,4 @@ def create_table_with_primary_key(host_name, user_name, user_password, db_name):
 
 # Test functions
 if __name__ == "__main__":
-    create_db_and_tables_with_keys("localhost", "root", "password", "creditcard_capstone")
+    create_db_and_tables_with_keys(host, username, password, database)

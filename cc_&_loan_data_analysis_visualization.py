@@ -3,6 +3,18 @@ from pyspark.sql.functions import col, count, sum, desc, substring, concat, lit
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from the .env file
+load_dotenv('secrets.env')
+
+host = os.getenv('HOST')
+username = os.getenv('USER')
+password = os.getenv('PASSWORD')
+database = os.getenv('DATABASE')
+database_url = os.getenv('DATABASE_URL')
+
 
 
 spark = SparkSession.builder.appName('loan_data_analysis_viz').getOrCreate()
@@ -12,10 +24,10 @@ spark = SparkSession.builder.appName('loan_data_analysis_viz').getOrCreate()
 # Load table into dataframe
 loan_df = spark.read \
     .format('jdbc') \
-    .option('url', 'jdbc:mysql://localhost:3306/creditcard_capstone') \
+    .option('url', database_url) \
     .option('dbtable', 'CDW_SAPP_LOAN_APP') \
-    .option('user', 'root') \
-    .option('password', 'password') \
+    .option('user', username) \
+    .option('password', password) \
     .load()
 
 # -----5.1-----
@@ -77,10 +89,10 @@ plt.close()
 
 cc_df = spark.read \
     .format('jdbc') \
-    .option('url', 'jdbc:mysql://localhost:3306/creditcard_capstone') \
+    .option('url', database_url) \
     .option('dbtable', 'CDW_SAPP_CREDIT_CARD') \
-    .option('user', 'root') \
-    .option('password', 'password') \
+    .option('user', username) \
+    .option('password', password) \
     .load()
     
 monthly_volume = cc_df.withColumn('Year', substring('TIME_ID', 1, 4)) \
@@ -125,10 +137,10 @@ plt.close()
 
 branch_df = spark.read \
     .format('jdbc') \
-    .option('url', 'jdbc:mysql://localhost:3306/creditcard_capstone') \
+    .option('url', database_url) \
     .option('dbtable', 'CDW_SAPP_BRANCH') \
-    .option('user', 'root') \
-    .option('password', 'password') \
+    .option('user', username) \
+    .option('password', password) \
     .load()
 
 

@@ -2,6 +2,17 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import initcap, concat, lit, lower, substring, lpad
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DoubleType, TimestampType
 from mysql_db_setup import create_db_and_tables_with_keys
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from the .env file
+load_dotenv('secrets.env')
+
+host = os.getenv('HOST')
+username = os.getenv('USER')
+password = os.getenv('PASSWORD')
+database = os.getenv('DATABASE')
+database_url = os.getenv('DATABASE_URL')
 
 # Create spark session
 spark = SparkSession.builder.appName('ETL_credit_card_data').getOrCreate()
@@ -117,13 +128,12 @@ print(credit_df.show(truncate=False))
 # -----LOAD-----
 
 # Create the database and the tables
-create_db_and_tables_with_keys("localhost", "root", "password", "creditcard_capstone")
+create_db_and_tables_with_keys(host, username, password, database)
 
 # Arguments for writing to the database using Pyspark
-jdbc_url = "jdbc:mysql://localhost:3306/creditcard_capstone"
 connection_prop = {
-    "user": "root",
-    "password": "password",
+    "user": username,
+    "password": password,
     "driver": "com.mysql.cj.jdbc.Driver"
 }
 
@@ -131,7 +141,7 @@ connection_prop = {
 # Using "overwrite" mode does not work since the tables already have foreign keys, so they can't be dropped
 def write_dataframe_to_mysql(df, table_name):
     try:
-        df.write.jdbc(url=jdbc_url, table=table_name, mode="append", properties=connection_prop)
+        df.write.jdbc(url=database_url, table=table_name, mode="append", properties=connection_prop)
         print(f"Successfully wrote DataFrame to table {table_name}")
     except Exception as e:
         print(f"Error writing DataFrame to table {table_name}: {e}")
@@ -141,9 +151,9 @@ write_dataframe_to_mysql(customer_df, "CDW_SAPP_CUSTOMER")
 write_dataframe_to_mysql(branch_df, "CDW_SAPP_BRANCH")
 write_dataframe_to_mysql(credit_df, "CDW_SAPP_CREDIT_CARD")
 
-# customer_df.write.jdbc(url=jdbc_url, table="CDW_SAPP_CUSTOMER", mode="append", properties=connection_prop)
-# branch_df.write.jdbc(url=jdbc_url, table="CDW_SAPP_BRANCH", mode="append", properties=connection_prop)
-# credit_df.write.jdbc(url=jdbc_url, table="CDW_SAPP_CREDIT_CARD", mode="append", properties=connection_prop)
+# customer_df.write.jdbc(url=database_url, table="CDW_SAPP_CUSTOMER", mode="append", properties=connection_prop)
+# branch_df.write.jdbc(url=database_url, table="CDW_SAPP_BRANCH", mode="append", properties=connection_prop)
+# credit_df.write.jdbc(url=database_url, table="CDW_SAPP_CREDIT_CARD", mode="append", properties=connection_prop)
 
 # Stop the session
 spark.stop()

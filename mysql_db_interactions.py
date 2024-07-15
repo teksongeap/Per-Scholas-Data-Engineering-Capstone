@@ -3,15 +3,26 @@ from mysql.connector import Error
 from datetime import datetime, timedelta
 import pandas as pd
 import re
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from the .env file
+load_dotenv('secrets.env')
+
+host = os.getenv('HOST')
+username = os.getenv('USER')
+password = os.getenv('PASSWORD')
+database = os.getenv('DATABASE')
+database_url = os.getenv('DATABASE_URL')
 
 # Creates the connection to mysql
 def create_connection():
     try:
         connection = dbconnect.connect(
-            host='localhost',
-            user='root',
-            password='password',
-            database='creditcard_capstone'
+            host=host,
+            user=username,
+            password=password,
+            database=database
         )
         if connection.is_connected():
             print("Connected to MySQL database")
@@ -325,5 +336,5 @@ def list_transactions_btwn_2_dates(firstname, lastname, last_4_ssn, date1, date2
 
 # Test functions
 if __name__ == "__main__":
-    list_transactions('98908', 5, 2018)
-    get_customer('marcel', 'camp', '1007')
+    print(list_transactions('98908', 5, 2018))
+    print(get_customer('marcel', 'camp', '1007'))

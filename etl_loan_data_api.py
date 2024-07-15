@@ -2,13 +2,23 @@ import requests
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType
 from mysql_db_setup import create_table_with_primary_key
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from the .env file
+load_dotenv('secrets.env')
+
+host = os.getenv('HOST')
+username = os.getenv('USER')
+password = os.getenv('PASSWORD')
+database = os.getenv('DATABASE')
+database_url = os.getenv('DATABASE_URL')
 
 spark = SparkSession.builder.appName('ETL_loan_data_api').getOrCreate()
 
-jdbc_url = "jdbc:mysql://localhost:3306/creditcard_capstone"
 connection_prop = {
-    "user": "root",
-    "password": "password",
+    "user": username,
+    "password": password,
     "driver": "com.mysql.cj.jdbc.Driver"
 }
 
@@ -49,7 +59,7 @@ def create_df_from_json(json_data):
 # write dataframe to mysql use overwrite mode, safe now because there are no foreign keys
 def write_df_to_mysql(df, table_name):
     try:
-        df.write.jdbc(url=jdbc_url, table=table_name, mode='overwrite', properties=connection_prop)
+        df.write.jdbc(url=database_url, table=table_name, mode='overwrite', properties=connection_prop)
         print(f"Successfully wrote DataFrame to table {table_name}")
     except Exception as e:
         print(f"Error writing DataFrame to table {table_name}: {e}")
@@ -70,7 +80,7 @@ if __name__ == "__main__":
         df = df.drop("_corrupt_record")
         
         # Create the CDW_SAPP_LOAN_APP table
-        create_table_with_primary_key("localhost", "root", "password", "creditcard_capstone")
+        create_table_with_primary_key(host, username, password, database)
         
         # Write to table
         write_df_to_mysql(df, table_name)
